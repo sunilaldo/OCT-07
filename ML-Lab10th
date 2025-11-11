@@ -1,0 +1,58 @@
+import numpy as np
+
+# Dataset
+X = np.array([[2, 9], [1, 5], [3, 6]], dtype=float)
+y = np.array([[92], [86], [89]], dtype=float)
+
+# Scale inputs and outputs
+X = X / np.amax(X, axis=0)
+y = y / 100.0  # scale output to [0,1]
+
+# Neural Network class
+class NeuralNetwork:
+    def __init__(self):
+        self.inputSize = 2
+        self.hiddenSize = 3
+        self.outputSize = 1
+        # Initialize weights
+        self.W1 = np.random.randn(self.inputSize, self.hiddenSize)
+        self.W2 = np.random.randn(self.hiddenSize, self.outputSize)
+        self.lr = 0.1  # learning rate
+
+    def sigmoid(self, s, deriv=False):
+        if deriv:
+            return s * (1 - s)
+        return 1 / (1 + np.exp(-s))
+
+    def feedForward(self, X):
+        self.z = np.dot(X, self.W1)
+        self.z2 = self.sigmoid(self.z)
+        self.z3 = np.dot(self.z2, self.W2)
+        output = self.sigmoid(self.z3)
+        return output
+
+    def backward(self, X, y, output):
+        output_error = y - output
+        output_delta = output_error * self.sigmoid(output, deriv=True)
+        z2_error = output_delta.dot(self.W2.T)
+        z2_delta = z2_error * self.sigmoid(self.z2, deriv=True)
+        # Update weights
+        self.W1 += X.T.dot(z2_delta) * self.lr
+        self.W2 += self.z2.T.dot(output_delta) * self.lr
+
+    def train(self, X, y, epochs=1000):
+        for i in range(epochs):
+            output = self.feedForward(X)
+            self.backward(X, y, output)
+            if i % 100 == 0:
+                loss = np.mean(np.square(y - output))
+                print(f"Epoch {i}, Loss: {loss:.5f}")
+
+# Train the network
+NN = NeuralNetwork()
+NN.train(X, y, epochs=1000)
+
+# Results
+print("\nInput:\n", X)
+print("Actual Output:\n", y)
+print("Predicted Output:\n", NN.feedForward(X))
