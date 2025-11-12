@@ -1,5 +1,60 @@
 import numpy as np
 
+X=np.array([[2,9],[1,5],[3,6]],float); y=np.array([[92],[86],[89]],float)
+X/=np.amax(X,0); y/=100
+
+class NN:
+    def __init__(s): 
+        s.W1=np.random.randn(2,3); s.W2=np.random.randn(3,1); s.lr=0.1
+    def sig(s,x,d=0): 
+        return x*(1-x) if d else 1/(1+np.exp(-x))
+    def fwd(s,X): 
+        s.z2=s.sig(X@s.W1); s.out=s.sig(s.z2@s.W2); return s.out
+    def bwd(s,X,y,o):
+        o_d=(y-o)*s.sig(o,1); z2_d=(o_d@s.W2.T)*s.sig(s.z2,1)
+        s.W1+=X.T@z2_d*s.lr; s.W2+=s.z2.T@o_d*s.lr
+    def train(s,X,y,ep=1000):
+        for i in range(ep):
+            o=s.fwd(X); s.bwd(X,y,o)
+            if i%100==0: print(f"Epoch {i}, Loss:{np.mean((y-o)**2):.5f}")
+
+nn=NN(); nn.train(X,y)
+print("\nInput:\n",X,"\nActual:\n",y,"\nPredicted:\n",nn.fwd(X))
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import numpy as np
+
 # Dataset
 X = np.array([[2, 9], [1, 5], [3, 6]], dtype=float)
 y = np.array([[92], [86], [89]], dtype=float)
